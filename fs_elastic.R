@@ -46,7 +46,7 @@ library(glmnet)
 library(caret)
 library(doParallel)
 # Define the function
-elastic_select <- function(data, formula, alpha = seq(0, 1, by = 0.1), trControl = trainControl(method = "cv", number = 5), use_pca = FALSE) {
+fs_elastic <- function(data, formula, alpha = seq(0, 1, by = 0.1), trControl = trainControl(method = "cv", number = 5), use_pca = FALSE) {
   
   # Extract the response and predictor variables from the formula
   y <- model.response(model.frame(formula, data))

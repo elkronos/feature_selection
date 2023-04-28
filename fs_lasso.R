@@ -17,8 +17,10 @@
 #' lassoImp <- train_lasso_model(trainData[, -1], trainData[, 1])
 #' 
 #' @export
-train_lasso_model <- function(x, y, alpha = 1, nfolds = 5) {
-  library(glmnet)
+# Load packages
+library(glmnet)
+# Save function
+fs_lasso <- function(x, y, alpha = 1, nfolds = 5) {
   
   # Fit a Lasso regression model
   lassoModel <- cv.glmnet(as.matrix(x), y, alpha = alpha, nfolds = nfolds)

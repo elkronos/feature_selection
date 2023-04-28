@@ -27,7 +27,8 @@
 #' @export
 library(data.table)
 library(tidyverse)
-perform_pca <- function(data, chunk_size = 1000) {
+library(stats)
+fs_pca <- function(data, chunk_size = 1000) {
   
   # Identify label column
   label_col <- data %>% select(where(is.character) | where(is.factor)) %>% names() %>% first()

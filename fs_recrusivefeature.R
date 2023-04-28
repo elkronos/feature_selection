@@ -16,10 +16,10 @@
 #' mtcars_imp <- rfe_var_imp("mtcars")
 #'
 #' @export
-rfe_var_imp <- function(data_name) {
-  
-  # Load the necessary packages
-  library(caret)
+# Load package
+library(caret)
+# Save function
+fs_recrusivefeature <- function(data_name) {
   
   # Load a dataset
   data <- get(data_name)

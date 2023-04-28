@@ -26,7 +26,7 @@
 #' print(head(num_pred))
 #'
 #' @export
-rf_select <- function(data, target, type, ntree = 500, importance = TRUE, 
+fs_randomforest <- function(data, target, type, ntree = 500, importance = TRUE, 
                       sample_size = NULL, feature_select = NULL, 
                       preprocess = NULL, n_cores = NULL) {
   

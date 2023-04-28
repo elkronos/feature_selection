@@ -33,7 +33,7 @@
 library(stats)
 library(dplyr)
 # Define a function that performs feature selection using chi-square test
-chi_square_select <- function(data, target_col, sig_level = 0.05, correct = TRUE) {
+fs_chi <- function(data, target_col, sig_level = 0.05, correct = TRUE) {
 
   # Convert non-numeric columns to factors
   data <- data %>% mutate_if(is.character, as.factor)

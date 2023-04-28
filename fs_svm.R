@@ -37,9 +37,11 @@
 #'
 #' @import e1071 caret
 #' @export
+# Load packages
 library(e1071)
 library(caret)
-svm_model <- function(data, target, task, nfolds=5, tune_grid=NULL) {
+# Save function
+fs_svm <- function(data, target, task, nfolds=5, tune_grid=NULL) {
   
   # Create formula for dependent and independent variables
   all_vars <- names(data)

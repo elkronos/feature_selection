@@ -26,7 +26,13 @@
 #' @importFrom doParallel registerDoParallel stopImplicitCluster
 #' @importFrom utils prompt
 #' @export
-boruta_select <- function(data, target_var, seed = NULL, doTrace = 1, maxRuns = 250, num_cores = NULL, cutoff_features = NULL, cutoff_cor = 0.7) {
+# Load packages
+library(Boruta)
+library(caret)
+library(data.table)
+library(doParallel)
+# Save function
+fs_boruta <- function(data, target_var, seed = NULL, doTrace = 1, maxRuns = 250, num_cores = NULL, cutoff_features = NULL, cutoff_cor = 0.7) {
   # convert input data to data.table object
   dt <- as.data.table(data)
   

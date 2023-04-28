@@ -24,7 +24,11 @@
 #' @importFrom stats lm regsubsets stepAIC
 #' @importFrom caret trainControl train
 #' @export
-stepwise_regression <- function(data, dependent_var, step_type = "both"){
+# Load packages
+library(caret)
+library(stats)
+# Save function
+fs_stepwise <- function(data, dependent_var, step_type = "both"){
   
   # Extract the dependent variable name as a string
   dep_var <- deparse(substitute(dependent_var))

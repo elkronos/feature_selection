@@ -26,7 +26,7 @@
 #' print(corr_vars$corr_matrix)
 #' print(corr_vars$selected_vars)
 #'
-correlation_select <- function(data, threshold, method = "pearson") {
+fs_correlation <- function(data, threshold, method = "pearson") {
   # Calculate the correlation matrix
   if (method == "pearson") {
     corr_matrix <- cor(data, method = "pearson")

@@ -26,7 +26,8 @@
 #' @importFrom stats entropy
 #' @importFrom base nrow
 library(dplyr)
-info_gain_stat <- function(data, feature, target, bins = 4, type = "categorical") {
+library(stats)
+fs_infogain <- function(data, feature, target, bins = 4, type = "categorical") {
   #Strip out rows where feature is NA
   data <- data[!is.na(data[, feature]),]
   

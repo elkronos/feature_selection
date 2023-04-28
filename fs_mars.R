@@ -26,7 +26,11 @@
 #' data <- data.frame(response = response, predictors = predictors)
 #' rmse <- train_mars(data)
 #' rmse
-train_mars <- function(data, p = 0.8, degree = 1:3, nprune = c(5, 10, 15),
+# Load packages
+library(earth)
+library(caret)
+# Save function
+fs_mars <- function(data, p = 0.8, degree = 1:3, nprune = c(5, 10, 15),
                        method = "earth", search = "grid", number = 5) {
   library(earth)
   library(caret)

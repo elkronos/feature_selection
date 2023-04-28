@@ -17,7 +17,7 @@
 #' # Check the dimensions of the thresholded dataset
 #' dim(thresholded_data)
 #' @export
-variance_threshold <- function(data, threshold) {
+fs_variance <- function(data, threshold) {
   # Set seed to ensure reproducibility
   set.seed(123)
   # Get the number of rows in the input data

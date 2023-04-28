@@ -32,7 +32,7 @@
 #' print(left_singular_vectors)
 #' cat("Right singular vectors: \n")
 #' print(right_singular_vectors)
-perform_svd <- memoise(function(matrix_data, scale_input = TRUE, n_singular_values = NULL) {
+fs_svd <- memoise(function(matrix_data, scale_input = TRUE, n_singular_values = NULL) {
   #' Check if the input is a matrix, throw an error if it's not
   if (!is.matrix(matrix_data)) {
     stop("Input must be a matrix.")
