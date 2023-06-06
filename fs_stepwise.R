@@ -1,3 +1,7 @@
+library(caret)
+library(MASS)
+library(leaps)
+
 #' Stepwise regression with cross-validation
 #'
 #' Fits a stepwise regression model with backward, forward, or both stepwise
@@ -24,53 +28,59 @@
 #' @importFrom stats lm regsubsets stepAIC
 #' @importFrom caret trainControl train
 #' @export
-# Load packages
-library(caret)
-library(stats)
-# Save function
 fs_stepwise <- function(data, dependent_var, step_type = "both"){
   
-  # Extract the dependent variable name as a string
+  if(!is.data.frame(data)){
+    stop("Input 'data' should be a data frame")
+  }
+  
   dep_var <- deparse(substitute(dependent_var))
   
-  # Build formula object
-  formula <- reformulate(".", response = dep_var)
+  if(!(dep_var %in% colnames(data))){
+    stop("Dependent variable is not a valid column in the data frame")
+  }
   
-  # Fit the full model 
+  set.seed(123)
+  
+  formula <- reformulate(".", response = dep_var)
   full.model <- lm(formula, data = data)
   
-  # Stepwise regression model
   step.model <- stepAIC(full.model, direction = step_type, 
                         trace = FALSE)
   
-  # Summary of stepwise regression model
   summary(step.model)
   
-  # Regression model using regsubsets function
-  models <- regsubsets(formula, data = data, nvmax = 5,
+  # Set 'nvmax' to the number of predictors
+  nvmax <- ncol(data) - 1
+  models <- regsubsets(formula, data = data, nvmax = nvmax,
                        method = "seqrep")
   
-  # Summary of regression models
   summary(models)
   
-  # Set seed for reproducibility
-  set.seed(123)
-  # Set up repeated k-fold cross-validation
   train.control <- trainControl(method = "cv", number = 10)
-  # Train the model
+  
+  # Map step_type to method
+  method <- switch(step_type,
+                   "both" = "leapSeq",
+                   "backward" = "leapBackward",
+                   "forward" = "leapForward",
+                   stop("Invalid step_type")
+  )
+  
   step.model <- train(formula, data = data,
-                      method = "leapBackward", 
-                      tuneGrid = data.frame(nvmax = 1:5),
+                      method = method, 
+                      tuneGrid = data.frame(nvmax = 1:nvmax),
                       trControl = train.control
   )
-  # Results of the model
+  
   result <- step.model$results
   best_tune <- step.model$bestTune
   final_model_summary <- summary(step.model$finalModel)
-  coefficients <- coef(step.model$finalModel, 4)
   
-  # Return the results
+  # Get the variable importance from the final model
+  importance <- varImp(step.model)
+  
   return(list(result = result, best_tune = best_tune, 
               final_model_summary = final_model_summary, 
-              coefficients = coefficients))
+              importance = importance))
 }
