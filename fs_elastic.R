@@ -45,20 +45,16 @@
 library(glmnet)
 library(caret)
 library(doParallel)
-# Define the function
 fs_elastic <- function(data, formula, alpha = seq(0, 1, by = 0.1), trControl = trainControl(method = "cv", number = 5), use_pca = FALSE) {
   
   # Extract the response and predictor variables from the formula
   y <- model.response(model.frame(formula, data))
   x <- model.matrix(formula, data)[,-1]
   
-  # Perform PCA if use_pca is TRUE
-  if (use_pca) {
-    pca <- prcomp(x, scale. = TRUE)
-    x_pca <- pca$x[, 1:3]
-  } else {
-    x_pca <- x
-  }
+  # Handle missing values if necessary
+  complete_cases <- complete.cases(x, y)
+  y <- y[complete_cases]
+  x <- x[complete_cases, ]
   
   # Define the grid of lambda values to search over
   lambda <- 10^seq(-3, 3, length = 100)
@@ -67,19 +63,41 @@ fs_elastic <- function(data, formula, alpha = seq(0, 1, by = 0.1), trControl = t
   cl <- makeCluster(detectCores() - 1)
   registerDoParallel(cl)
   
+  # Load necessary libraries on each core
+  clusterEvalQ(cl, {
+    library(caret)
+    library(glmnet)
+  })
+  
   # Fit the elastic net models using cross-validation and grid search
-  cv_fit <- train(x_pca, y,
-                  method = "glmnet",
-                  tuneGrid = expand.grid(alpha = alpha,
-                                         lambda = lambda),
-                  trControl = trControl)
+  cv_fit <- foreach(a = alpha, .combine = "c", .packages = c("caret", "glmnet")) %dopar% {
+    # Perform PCA if use_pca is TRUE
+    if (use_pca) {
+      pca <- prcomp(x, scale. = TRUE)
+      x_pca <- pca$x[, 1:3]
+    } else {
+      x_pca <- x
+    }
+    
+    # Create a tuneGrid for each alpha
+    tuneGrid <- expand.grid(alpha = a, lambda = lambda)
+    
+    fit <- train(x_pca, y,
+                 method = "glmnet",
+                 tuneGrid = tuneGrid,
+                 trControl = trControl)
+    
+    list(RMSE = fit$results$RMSE[which.min(fit$results$RMSE)], model = fit)
+  }
   
   # Stop the parallelization
   stopCluster(cl)
   
+  # Get the model with the best performance
+  best_model <- cv_fit[[which.min(sapply(cv_fit, function(cv) cv$RMSE))]]$model
+  
   # Return the coefficients and alpha and lambda values of the best model
-  list(coef = coef(cv_fit$finalModel,
-                   s = cv_fit$bestTune$lambda),
-       alpha = cv_fit$bestTune$alpha,
-       lambda = cv_fit$bestTune$lambda)
+  list(coef = coef(best_model$finalModel, s = best_model$bestTune$lambda),
+       alpha = best_model$bestTune$alpha,
+       lambda = best_model$bestTune$lambda)
 }
