@@ -10,22 +10,24 @@
 #' @param method The correlation method to use, either "pearson" or "spearman".
 #'
 #' @return A list containing two elements: the correlation matrix and the
-#'   selected variables.
+#'   selected variables. If no variables meet the correlation threshold, the
+#'   selected variables will be NULL.
 #'
 #' @examples
 #' # Load the mtcars data set
 #' data(mtcars)
 #'
 #' # Default is Pearson
-#' corr_vars <- correlation_select(mtcars, 0.7)
+#' corr_vars <- fs_correlation(mtcars, 0.7)
 #' print(corr_vars$corr_matrix)
 #' print(corr_vars$selected_vars)
 #'
 #' # Specify spearman
-#' corr_vars <- correlation_select(mtcars, 0.7, method = "spearman")
+#' corr_vars <- fs_correlation(mtcars, 0.7, method = "spearman")
 #' print(corr_vars$corr_matrix)
 #' print(corr_vars$selected_vars)
 #'
+#' @export
 fs_correlation <- function(data, threshold, method = "pearson") {
   # Calculate the correlation matrix
   if (method == "pearson") {
@@ -43,14 +45,15 @@ fs_correlation <- function(data, threshold, method = "pearson") {
   high_corr_vars <- high_corr_vars[high_corr_vars[,1] < high_corr_vars[,2],]
   
   # Check if there are any selected variables
-  if (nrow(high_corr_vars) == 0) {
+  if (length(high_corr_vars) == 0) {
     message("No variables meet the correlation threshold.")
-    return(list(corr_matrix = as.data.frame(corr_matrix), selected_vars = data))
+    return(list(corr_matrix = as.data.frame(corr_matrix), selected_vars = NULL))
   }
   
   # Extract the selected variables from the data frame
   selected_vars <- unique(c(high_corr_vars))
-  selected_data <- data[,selected_vars]
+  selected_names <- colnames(data)[selected_vars]
+  selected_data <- data[,selected_names]
   
   # Save the correlation matrix and selected variables as data frames in a list
   result <- list(corr_matrix = as.data.frame(corr_matrix), selected_vars = selected_data)
